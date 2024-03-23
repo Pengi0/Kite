@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react";
+import { Key, MouseEventHandler, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { send, toImg } from "../../lib/io";
 
@@ -11,6 +11,7 @@ interface plateProps {
 }
 interface searchPlateProps {
   pfp: string;
+  key: Key;
   rname: string;
   uname: string;
 }
@@ -18,7 +19,13 @@ interface searchPlateProps {
 interface searchProps {
   enabled: boolean;
 }
-
+interface moreMenuProps {
+  enabled: boolean;
+  setUser: any;
+}
+interface sidebarProps {
+  setUser: any;
+}
 function SidebarPlate(props: plateProps) {
   return (
     <div
@@ -74,9 +81,8 @@ function SearchMenu(props: searchProps) {
         const y = await send(x);
         setList(y._data);
         console.log(y._data);
-
-        onChanging = false;
       }
+      onChanging = false;
     }
   }
 
@@ -99,21 +105,45 @@ function SearchMenu(props: searchProps) {
       />
       <div>
         {list.map((el: any) => {
-          return <SearchPlate pfp={el[2]} uname={el[0]} rname={el[1]} />;
+          return (
+            <SearchPlate key={el[0]} pfp={el[2]} uname={el[0]} rname={el[1]} />
+          );
         })}
       </div>
     </div>
   );
 }
-
-export default function Sidebar() {
+function MoreMenu(props: moreMenuProps) {
+  return (
+    <div
+      className={
+        "absolute w-72 bg-gray-200 rounded-xl z-40 left-2 bottom-28 overflow-hidden transition-all duration-100 " +
+        (!props.enabled ? "h-0" : "h-auto")
+      }
+    >
+      <SidebarPlate
+        icon="logout"
+        name="Log out"
+        action={() => {
+          props.setUser({
+            uid: 0,
+            pass: "",
+          });
+        }}
+      />
+    </div>
+  );
+}
+export default function Sidebar(props: sidebarProps) {
   const navigate = useNavigate();
   const [searchEnabled, setSearchEnabled] = useState(false);
+  const [moreEnabled, setMoreEnabled] = useState(false);
 
   return (
     <>
       <SearchMenu enabled={searchEnabled} />
-      <div className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
+      <MoreMenu enabled={moreEnabled} setUser={props.setUser} />
+      <span className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
         <span className="material-symbols-rounded text-4xl w-full py-7 pl-5 hover:cursor-pointer bg-gray-300">
           KITE
         </span>
@@ -136,7 +166,16 @@ export default function Sidebar() {
           name="Profile"
           action={() => navigate("/profile")}
         />
-      </div>
+        <div
+          onClick={() => setMoreEnabled(!moreEnabled)}
+          className="m-2 p-5 rounded-xl absolute w-72 bottom-0 hover:cursor-pointer hover:bg-gray-300 transition-all duration-200"
+        >
+          <span className="material-symbols-rounded mr-10 ml-3 text-4xl">
+            Menu
+          </span>
+          <div className="inline-block relative -translate-y-2">More</div>
+        </div>
+      </span>
     </>
   );
 }

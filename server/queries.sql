@@ -20,6 +20,6 @@ SELECT * FROM FriendsRelationship;
 INSERT INTO FriendsRelationship VALUES (1, (SELECT _id FROM UserAccounts WHERE _uname = 'pengi'));
 DELETE FROM FriendsRelationship WHERE _follower = 1 AND _following = (SELECT _id FROM UserAccounts WHERE _uname = 'pengi');
 
-SELECT UserProfiles._pfp FROM UserProfiles INNER JOIN FriendsRelationship ON UserProfiles(_id) = FriendsRelationship(_id);
+SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname FROM UserProfiles INNER JOIN FriendsRelationship ON UserProfiles._id = FriendsRelationship._follower;
 
 truncate FriendsRelationship;
