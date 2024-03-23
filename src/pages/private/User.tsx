@@ -4,6 +4,7 @@ import { Post } from "./Profile";
 import { useEffect, useState } from "react";
 import { send, toImg } from "../../lib/io";
 var received = false;
+var gotData = false;
 interface userProps {
   setUser: React.Dispatch<
     React.SetStateAction<{
@@ -143,7 +144,11 @@ export default function User(props: userProps) {
 
   return (
     <>
-      <Sidebar setUser={props.setUser} setLoggedIn={props.setLoggedIn} />
+      <Sidebar
+        setUser={props.setUser}
+        user={props.user}
+        setLoggedIn={props.setLoggedIn}
+      />
       {relationWindow && (
         <Relations
           user={uName}

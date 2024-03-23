@@ -16,7 +16,11 @@ interface homeProps {
 export default function Home(props: homeProps) {
   return (
     <>
-      <Sidebar setUser={props.setUser} setLoggedIn={props.setLoggedIn} />
+      <Sidebar
+        setUser={props.setUser}
+        user={props.user}
+        setLoggedIn={props.setLoggedIn}
+      />
       <div className="ml-80">Home</div>
     </>
   );

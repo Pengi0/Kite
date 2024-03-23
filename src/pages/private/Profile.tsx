@@ -376,7 +376,11 @@ export default function Profile(props: profileProps) {
 
   return (
     <>
-      <Sidebar setUser={props.setUser} setLoggedIn={props.setLoggedIn} />
+      <Sidebar
+        setUser={props.setUser}
+        user={props.user}
+        setLoggedIn={props.setLoggedIn}
+      />
       {relationWindow && (
         <Relations
           user={props.user}

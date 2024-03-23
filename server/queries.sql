@@ -34,4 +34,8 @@ SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfi
     ON UserProfiles._id = FriendsRelationship._following
 	WHERE FriendsRelationship._follower = (SElECT _id FROM UserAccounts WHERE _uname = 'pengi');
 
-truncate FriendsRelationship;
+-- Notifications
+CREATE TABLE Notifications (_id INT, FOREIGN KEY(_id) REFERENCES UserAccounts(_id), _date DATE, _msg CHAR(255), _read BOOL);
+DROP TABLE Notifications ;
+SELECT CONCAT(_msg, DATEDIFF(_date, CURDATE()), " days ago") FROM Notifications;
+INSERT INTO Notifications VALUES (3, CURDATE(), "{data['_uname']} Started Following You. - ", FALSE);

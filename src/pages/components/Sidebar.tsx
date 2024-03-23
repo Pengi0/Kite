@@ -1,9 +1,9 @@
-import { Key, MouseEventHandler, useState } from "react";
+import { Key, MouseEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { send, toImg } from "../../lib/io";
 
 var onChanging = false;
-
+var gotNotifications = false;
 interface plateProps {
   icon: string;
   name: string;
@@ -26,8 +26,10 @@ interface moreMenuProps {
 }
 interface sidebarProps {
   setUser: any;
+  user: any;
   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 function SidebarPlate(props: plateProps) {
   return (
     <div
@@ -66,7 +68,6 @@ export function SearchPlate(props: searchPlateProps) {
     </div>
   );
 }
-
 function SearchMenu(props: searchProps) {
   const [list, setList] = useState([]);
 
@@ -115,6 +116,52 @@ function SearchMenu(props: searchProps) {
     </div>
   );
 }
+function NotificationPlate({ str }: { str: string }) {
+  return (
+    <div className="m-2 p-5 rounded-xl bg-gray-300 transition-all duration-200 overflow-clip">
+      {str}
+    </div>
+  );
+}
+function NotificationMenu(props: { enabled: boolean; user: any }) {
+  const [list, setList] = useState([]);
+
+  async function fun() {
+    if (!gotNotifications) {
+      gotNotifications = true;
+
+      const x = {
+        type: "get-notifications",
+        _id: props.user.uid,
+      };
+      console.log(x);
+      const y = await send(x);
+      setList(y._data);
+      console.log(y._data);
+    }
+  }
+
+  useEffect(() => {
+    fun();
+  });
+  return (
+    <div
+      className={
+        "absolute w-96 h-screen z-10 bg-gray-200 transition-all " +
+        (props.enabled ? "left-80" : "-left-16")
+      }
+    >
+      <div className="h-full w-0.5 bg-slate-600 absolute"></div>
+      <div className="text-3xl mt-5 ml-4 mb-5">Notifications</div>
+      <hr className="h-0.5 mx-2 bg-slate-600 mb-3" />
+      <div>
+        {list.map((el: any) => {
+          return <NotificationPlate str={el[0]} key={el[0]} />;
+        })}
+      </div>
+    </div>
+  );
+}
 function MoreMenu(props: moreMenuProps) {
   return (
     <div
@@ -140,6 +187,7 @@ function MoreMenu(props: moreMenuProps) {
 export default function Sidebar(props: sidebarProps) {
   const navigate = useNavigate();
   const [searchEnabled, setSearchEnabled] = useState(false);
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [moreEnabled, setMoreEnabled] = useState(false);
 
   return (
@@ -150,6 +198,7 @@ export default function Sidebar(props: sidebarProps) {
         setUser={props.setUser}
         setLoggedIn={props.setLoggedIn}
       />
+      <NotificationMenu enabled={notificationEnabled} user={props.user} />
       <span className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
         <span className="material-symbols-rounded text-4xl w-full py-7 pl-5 hover:cursor-pointer bg-gray-300">
           KITE
@@ -168,6 +217,14 @@ export default function Sidebar(props: sidebarProps) {
         />
         <SidebarPlate icon="Explore" name="Explore" action={undefined} />
         <SidebarPlate icon="add_box" name="Create" action={undefined} />
+        <SidebarPlate
+          icon={"notifications"}
+          name="Notifications"
+          action={() => {
+            setNotificationEnabled(!notificationEnabled);
+            gotNotifications = false;
+          }}
+        />
         <SidebarPlate
           icon="person"
           name="Profile"

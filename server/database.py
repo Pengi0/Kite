@@ -167,6 +167,10 @@ class dbase:
                 INSERT INTO FriendsRelationship VALUES ({data['_id']}, (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}"));
             """)
             self.connection.commit()
+            self.cursor.execute(f"""
+                INSERT INTO Notifications VALUES ((SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}"), CURDATE(), CONCAT((SELECT _uname FROM UserAccounts WHERE _id = "{data['_id']}"), " Started Following You. - "), FALSE);
+            """)
+            self.connection.commit()
 
             return {'error':0, '_action': 'Following'}
         except mysql.connector.Error as e:
@@ -221,3 +225,25 @@ class dbase:
 
             return {'error':e.errno, 'msg':e.msg}
 
+    def GetNotifications(self, data):
+        try:
+            self.cursor.execute(f"""
+                SELECT CONCAT(_msg, DATEDIFF(_date, CURDATE()), " days ago"), _read FROM Notifications WHERE _id = {data['_id']};
+            """)
+            x = self.cursor.fetchall()
+            self.cursor.execute(f"""
+                SELECT * FROM Notifications WHERE _id = {data['_id']} AND _read = FALSE;
+            """)
+            y = self.cursor.fetchall()
+            print(y)
+            if y.__len__ != 0:
+                unread = True
+                self.cursor.execute(f"""
+                    UPDATE Notifications SET _read = TRUE WHERE _id = {data['_id']};
+                """)
+                self.connection.commit()
+            else: unread = False
+
+            return {'error': 0, '_data': x, '_unread': unread}
+        except mysql.connector.Error as er:
+            pass
