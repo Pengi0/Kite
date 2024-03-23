@@ -1,9 +1,22 @@
 import Sidebar from "../components/Sidebar";
 
-export default function Home() {
+interface homeProps {
+  setUser: React.Dispatch<
+    React.SetStateAction<{
+      uid: number;
+      pass: string;
+    }>
+  >;
+  user: {
+    uid: number;
+    pass: string;
+  };
+  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export default function Home(props: homeProps) {
   return (
     <>
-      <Sidebar />
+      <Sidebar setUser={props.setUser} setLoggedIn={props.setLoggedIn} />
       <div className="ml-80">Home</div>
     </>
   );

@@ -15,11 +15,23 @@ ON AC._id = UP._id
 WHERE AC._uname LIKE "%pr%" OR UP._rname LIKE "%pr%";
 
 CREATE TABLE FriendsRelationship(_follower INT, _follwing INT, UNIQUE(_follower, _following), FOREIGN KEY(_follower) REFERENCES UserAccounts(_id), FOREIGN KEY(_following) REFERENCES UserAccounts(_id));
-SELECT * FROM FriendsRelationship;
+SELECT * FROM FriendsRelationship ORDER BY _following;
 
 INSERT INTO FriendsRelationship VALUES (1, (SELECT _id FROM UserAccounts WHERE _uname = 'pengi'));
 DELETE FROM FriendsRelationship WHERE _follower = 1 AND _following = (SELECT _id FROM UserAccounts WHERE _uname = 'pengi');
 
-SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname FROM UserProfiles INNER JOIN FriendsRelationship ON UserProfiles._id = FriendsRelationship._follower;
+-- Follower
+SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+	FROM UserProfiles 
+    INNER JOIN FriendsRelationship 
+    ON UserProfiles._id = FriendsRelationship._follower 
+	WHERE FriendsRelationship._following = (SElECT _id FROM UserAccounts WHERE _uname = 'pengi');
+
+-- Following
+SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+	FROM UserProfiles 
+    INNER JOIN FriendsRelationship 
+    ON UserProfiles._id = FriendsRelationship._following
+	WHERE FriendsRelationship._follower = (SElECT _id FROM UserAccounts WHERE _uname = 'pengi');
 
 truncate FriendsRelationship;

@@ -112,7 +112,6 @@ class dbase:
                     return {'error':e.errno, 'msg':'User with this email already exists'}
             return {'error':e.errno, 'msg':e.msg}
         
-
     def Search(self, data):
         try:
             self.cursor.execute(f"""
@@ -147,8 +146,18 @@ class dbase:
             self.cursor.execute(f"""
                     SELECT * FROM FriendsRelationship WHERE _follower = {data['_id']} AND _following = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
                 """)
+            r = self.cursor.fetchone()
+            self.cursor.execute(f"""
+                SELECT count(*) FROM FriendsRelationship WHERE _following=(SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+            """)
+            z = (self.cursor.fetchone())[0]
+            self.cursor.execute(f"""
+                SELECT count(*) FROM FriendsRelationship WHERE _follower=(SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+            """)
+            q = (self.cursor.fetchone())[0]
+        
             
-            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_doesFollow': ('Following' if self.cursor.fetchone() != None else 'Follow')}
+            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q, '_doesFollow': ('Following' if r != None else 'Follow')}
         except mysql.connector.Error as e:
             return {'error':e.errno, 'msg':e.msg}
     
@@ -169,24 +178,46 @@ class dbase:
                 return {'error': 0, 'action': 'Follow'}                
             return {'error':e.errno, 'msg':e.msg}
     
-    def getRelations(self, data):
+    def GetRelations(self, data):
         try:
-            self.cursor.execute(f"""
-                SELECT * FROM UserAccounts WHERE _id = {data['_id']} AND _pass = "{data['_pass']}"
-            """)
-            x = self.cursor.fetchone()
-            if(x == None):
-                return {'error': 801, 'msg':'something went wrong'}
-            if(data['get'] == 'follower'):
-               self.cursor.execute(f"""
-                    SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname FROM UserProfiles INNER JOIN FriendsRelationship ON UserProfiles._id = FriendsRelationship._follower WHERE FriendsRelationship._following = {data['_id']};
-                """)
-            return {'error':0, 'msg':''}
+            if data['_useUname'] == False:
+                if data['_get'] == 'Followers':
+                   self.cursor.execute(f"""
+                        SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+                        	FROM UserProfiles 
+                            INNER JOIN FriendsRelationship 
+                            ON UserProfiles._id = FriendsRelationship._follower 
+	                        WHERE FriendsRelationship._following = {data['_id']};
+                    """)
+                elif data['_get'] == 'Following':
+                   self.cursor.execute(f"""
+                        SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+	                        FROM UserProfiles 
+                            INNER JOIN FriendsRelationship 
+                            ON UserProfiles._id = FriendsRelationship._following
+    	                    WHERE FriendsRelationship._follower = {data['_id']};
+                    """)
+            else:
+                if data['_get'] == 'Followers':
+                   self.cursor.execute(f"""
+                        SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+                        	FROM UserProfiles 
+                            INNER JOIN FriendsRelationship 
+                            ON UserProfiles._id = FriendsRelationship._follower 
+	                        WHERE FriendsRelationship._following = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+                    """)
+                elif data['_get'] == 'Following':
+                   self.cursor.execute(f"""
+                        SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfiles._id), UserProfiles._rname 
+	                        FROM UserProfiles 
+                            INNER JOIN FriendsRelationship 
+                            ON UserProfiles._id = FriendsRelationship._following
+    	                    WHERE FriendsRelationship._follower = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+                    """)
+                
+            return {'error':0, 'data': self.cursor.fetchall()}
         except mysql.connector.Error as e:
             print(e.msg)
-            if e.errno == 1062:
-                if e.msg.find('_uname') != -1:
-                    return {'error':e.errno, 'msg':'User with this user name already exists'}
-                if e.msg.find('_email') != -1:
-                    return {'error':e.errno, 'msg':'User with this email already exists'}
+
             return {'error':e.errno, 'msg':e.msg}
+

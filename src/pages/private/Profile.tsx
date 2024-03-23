@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar, { SearchPlate } from "../components/Sidebar";
 import { isAlphaNum, send, toImg, validateEmail } from "../../lib/io";
 
 interface editProfileProps {
@@ -32,7 +32,14 @@ interface profileProps {
       pass: string;
     }>
   >;
+  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
+interface relationProps {
+  type: string;
+  user: any;
+  setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 var useEffectOn = false;
 var EditSend = false;
 export function Post() {
@@ -147,10 +154,10 @@ function EditProfile(props: editProfileProps) {
         pass = props.user.pass;
       }
       if (!isAlphaNum(UName)) {
-        setEr("User Name is not Alpha-Numaric");
+        setEr("User Name is not Alpha-Numeric");
       }
       if (!isAlphaNum(RName)) {
-        setEr("Real Name is not Alpha-Numaric");
+        setEr("Real Name is not Alpha-Numeric");
       }
       const x = {
         type: "update-profile",
@@ -163,7 +170,6 @@ function EditProfile(props: editProfileProps) {
         _email: Email,
         _repass: pass,
       };
-      console.log("hjgkhg");
 
       const y = await send(x);
       if (y.error != 0) setEr(y.msg);
@@ -280,10 +286,59 @@ function EditProfile(props: editProfileProps) {
   );
 }
 
+function Relations(props: relationProps) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fun() {
+      if (!useEffectOn) {
+        useEffectOn = true;
+        const x = {
+          type: "get-relations",
+          _get: props.type,
+          _id: props.user.uid,
+          _useUname: false,
+        };
+        const y = await send(x);
+        setData(y.data);
+        useEffectOn = false;
+      }
+    }
+
+    fun();
+  });
+
+  return (
+    <div className={"absolute z-20 w-screen h-screen "}>
+      <div
+        className={
+          "w-[36rem] h-[48rem] fixed left-1/3 top-8 rounded-3xl p-4 z-10 bg-gray-200 overflow-y-scroll"
+        }
+      >
+        <span
+          onClick={() => {
+            props.setEnabled(false);
+          }}
+          className="material-symbols-rounded p-1 px-2 absolute right-5 top-3 text-3xl hover:cursor-pointer hover:bg-gray-400 rounded-full"
+        >
+          Close
+        </span>
+        <div className="text-3xl ml-5">{props.type}</div>
+        <hr className="my-3" />
+        {data.map((el: any) => {
+          return (
+            <SearchPlate key={el[1]} pfp={el[0]} uname={el[1]} rname={el[2]} />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function Profile(props: profileProps) {
-  const [uName, setUname] = useState("Pringle");
-  const [rName, setRName] = useState("Real name");
-  const [bio, setBio] = useState("Bio");
+  const [uName, setUname] = useState("");
+  const [rName, setRName] = useState("");
+  const [bio, setBio] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState("");
   const [follower, setFollower] = useState(118);
@@ -291,6 +346,9 @@ export default function Profile(props: profileProps) {
   const [postNo, setPostNo] = useState(0);
 
   const [edit, setEdit] = useState(false);
+  const [relationWindow, setRelationWindow] = useState(false);
+  const [relationType, setRelationType] = useState("");
+
   useEffect(() => {
     async function fun() {
       if (!useEffectOn) {
@@ -318,8 +376,14 @@ export default function Profile(props: profileProps) {
 
   return (
     <>
-      <Sidebar />
-
+      <Sidebar setUser={props.setUser} setLoggedIn={props.setLoggedIn} />
+      {relationWindow && (
+        <Relations
+          user={props.user}
+          setEnabled={setRelationWindow}
+          type={relationType}
+        />
+      )}
       {edit && (
         <EditProfile
           setUser={props.setUser}
@@ -353,8 +417,27 @@ export default function Profile(props: profileProps) {
             className="mb-8 text-xl"
             style={{ gridColumn: "2 / span 2", gridRow: "3" }}
           >
-            {postNo} posts &emsp; {follower} followers &emsp; {following}{" "}
-            following
+            <span> {postNo} posts </span>
+            &emsp;
+            <span
+              onClick={() => {
+                setRelationWindow(true);
+                setRelationType("Followers");
+              }}
+              className="hover:cursor-pointer"
+            >
+              {follower} followers
+            </span>
+            &emsp;
+            <span
+              onClick={() => {
+                setRelationWindow(true);
+                setRelationType("Following");
+              }}
+              className="hover:cursor-pointer"
+            >
+              {following} following
+            </span>
           </div>
           <div style={{ gridColumn: "2", gridRow: "4" }}>{bio}</div>
           <button onClick={() => setEdit(true)} style={{ gridColumn: "3" }}>

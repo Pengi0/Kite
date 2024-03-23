@@ -37,12 +37,28 @@ function App() {
           />
         </Route>
         <Route element={<Auth condition={!loggedIn} path="/sign-in" />}>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <Home user={user} setUser={setUser} setLoggedIn={setLoggedIn} />
+            }
+          />
           <Route
             path="/profile"
-            element={<Profile user={user} setUser={setUser} />}
+            element={
+              <Profile
+                user={user}
+                setUser={setUser}
+                setLoggedIn={setLoggedIn}
+              />
+            }
           />
-          <Route path="/usr/:uName" element={<User user={user} />} />
+          <Route
+            path="/usr/:uName"
+            element={
+              <User setUser={setUser} user={user} setLoggedIn={setLoggedIn} />
+            }
+          />
         </Route>
         <Route path="/*" element={<Error404 />} />
       </Routes>

@@ -22,9 +22,11 @@ interface searchProps {
 interface moreMenuProps {
   enabled: boolean;
   setUser: any;
+  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface sidebarProps {
   setUser: any;
+  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 function SidebarPlate(props: plateProps) {
   return (
@@ -39,7 +41,7 @@ function SidebarPlate(props: plateProps) {
     </div>
   );
 }
-function SearchPlate(props: searchPlateProps) {
+export function SearchPlate(props: searchPlateProps) {
   const navigate = useNavigate();
   function onClick() {
     navigate("/usr/" + props.uname);
@@ -129,6 +131,7 @@ function MoreMenu(props: moreMenuProps) {
             uid: 0,
             pass: "",
           });
+          props.setLoggedIn(false);
         }}
       />
     </div>
@@ -142,7 +145,11 @@ export default function Sidebar(props: sidebarProps) {
   return (
     <>
       <SearchMenu enabled={searchEnabled} />
-      <MoreMenu enabled={moreEnabled} setUser={props.setUser} />
+      <MoreMenu
+        enabled={moreEnabled}
+        setUser={props.setUser}
+        setLoggedIn={props.setLoggedIn}
+      />
       <span className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
         <span className="material-symbols-rounded text-4xl w-full py-7 pl-5 hover:cursor-pointer bg-gray-300">
           KITE

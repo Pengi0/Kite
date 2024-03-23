@@ -57,6 +57,9 @@ def handleRequest():
         print(x)
     elif data['type'] == 'follow-request':
         x = dbase.FollowRequest(data)
+    elif data['type'] == 'get-relations':
+        x = dbase.GetRelations(data)
+        print(x)
     elif data['type'] == 'post-img':
         loc = save_img(data['base64'])
         x = {'error':0, 'loc': loc}
