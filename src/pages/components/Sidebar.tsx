@@ -1,6 +1,7 @@
 import { Key, MouseEventHandler, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { send, toImg } from "../../lib/io";
+import CreatePost from "./CreatePost";
 
 var onChanging = false;
 var gotNotifications = false;
@@ -189,6 +190,7 @@ export default function Sidebar(props: sidebarProps) {
   const [searchEnabled, setSearchEnabled] = useState(false);
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [moreEnabled, setMoreEnabled] = useState(false);
+  const [createNewEnabled, setCreateNewEnabled] = useState(false);
 
   return (
     <>
@@ -199,6 +201,7 @@ export default function Sidebar(props: sidebarProps) {
         setLoggedIn={props.setLoggedIn}
       />
       <NotificationMenu enabled={notificationEnabled} user={props.user} />
+      {createNewEnabled && <CreatePost setEnabled={setCreateNewEnabled} />}
       <span className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
         <span className="material-symbols-rounded text-4xl w-full py-7 pl-5 hover:cursor-pointer bg-gray-300">
           KITE
@@ -216,7 +219,11 @@ export default function Sidebar(props: sidebarProps) {
           action={() => setSearchEnabled(!searchEnabled)}
         />
         <SidebarPlate icon="Explore" name="Explore" action={undefined} />
-        <SidebarPlate icon="add_box" name="Create" action={undefined} />
+        <SidebarPlate
+          icon="add_box"
+          name="Create"
+          action={() => setCreateNewEnabled(true)}
+        />
         <SidebarPlate
           icon={"notifications"}
           name="Notifications"
