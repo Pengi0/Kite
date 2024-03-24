@@ -82,8 +82,13 @@ class dbase:
                 SELECT count(*) FROM FriendsRelationship WHERE _follower={data['_id']};
             """)
             q = (self.cursor.fetchone())[0]
-        
-            return {'error':0, '_uname':x[0],  '_rname': x[1], '_bio' : x[2], '_pfp' : x[3], '_email' : x[4], '_follower': z, '_following': q}
+            self.cursor.execute(f"""
+                select * from Posts WHERE _uid = {data['_id']};
+            """)
+            y = self.cursor.fetchall()
+
+
+            return {'error':0, '_uname':x[0],  '_rname': x[1], '_bio' : x[2], '_pfp' : x[3], '_email' : x[4], '_follower': z, '_following': q, '_posts': y}
         except mysql.connector.Error as e:
             return {'error':e.errno, 'msg':e.msg}
     

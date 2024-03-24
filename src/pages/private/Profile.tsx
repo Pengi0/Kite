@@ -39,17 +39,33 @@ interface relationProps {
   user: any;
   setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
+interface postProps {
+  src: string | number;
+}
+interface textPostProps {
+  src: string;
+}
 var useEffectOn = false;
 var EditSend = false;
-export function Post() {
+export function Post(props: postProps) {
   return (
     <div className="w-60 aspect-square rounded-2xl m-2 bg-gray-600 hover:cursor-pointer hover:m-0 hover:w-64 transition-all">
-      <img src="" alt="" />
+      <img
+        src={toImg(props.src.toString())}
+        className="rounded-2xl object-cover w-full"
+      />
+      {/* <div className="m-5 text-white">{props.src}</div> */}
     </div>
   );
 }
 
+function TextPost(props: textPostProps) {
+  return (
+    <div className="w-96 h-32 p-3 my-2 overflow-hidden rounded-xl text-white bg-gray-700">
+      {props.src}
+    </div>
+  );
+}
 function EditProfile(props: editProfileProps) {
   const [src, setSrc] = useState(toImg(props.pfp));
   const [er, setEr] = useState("");
@@ -335,6 +351,11 @@ export default function Profile(props: profileProps) {
   const [relationWindow, setRelationWindow] = useState(false);
   const [relationType, setRelationType] = useState("");
 
+  const [imgData, setImgData] = useState([] as (string | number)[][]);
+  const [msgData, setMsgData] = useState([] as (string | number)[][]);
+  var _imgData = [] as (string | number)[][];
+  var _msgData = [] as (string | number)[][];
+  var data = [];
   useEffect(() => {
     async function fun() {
       if (!useEffectOn) {
@@ -353,6 +374,16 @@ export default function Profile(props: profileProps) {
         setEmail(y._email);
         setFollower(y._follower);
         setFollowing(y._following);
+
+        data = y._posts as (string | number)[][];
+
+        data.forEach((element) => {
+          if (element[2] != "") _imgData.push(element);
+          else _msgData.push(element);
+        });
+        setImgData(_imgData);
+        setMsgData(_msgData);
+        console.log(imgData, msgData);
         useEffectOn = false;
       }
     }
@@ -436,17 +467,42 @@ export default function Profile(props: profileProps) {
         </div>
         <hr className="w-1/2 mb-5 mx-auto border-gray-700" />
         <div className="w-1/2 mb-5 mx-auto text-3xl">Posts - </div>
-
-        <div className="w-1/2 flex flex-col mx-auto">
-          <div className="flex flex-row">
-            <Post />
-            <Post />
-            <Post />
+        <div className="mx-auto flex justify-center">
+          <div className="w-1/2 inline-block text-xl">
+            {data.length == 0 && "No Posts Found"}
+            {imgData.map(
+              (
+                value: (string | number)[],
+                index: number,
+                array: (string | number)[][]
+              ) => {
+                if (index % 3 == 0)
+                  return (
+                    <div className=" flex flex-row">
+                      {index < array.length && (
+                        <Post key={value[0] + "P"} src={value[2]} />
+                      )}
+                      {index + 1 < array.length && (
+                        <Post
+                          key={array[index + 1][0] + "P"}
+                          src={array[index + 1][2]}
+                        />
+                      )}
+                      {index + 2 < array.length && (
+                        <Post
+                          key={array[index + 2][0] + "P"}
+                          src={array[index + 2][2]}
+                        />
+                      )}
+                    </div>
+                  );
+              }
+            )}
           </div>
-          <div className="flex flex-row">
-            <Post />
-            <Post />
-            <Post />
+          <div className="inline-block">
+            {msgData.map((value: (string | number)[]) => {
+              return <TextPost src={value[3].toString()} />;
+            })}
           </div>
         </div>
       </div>
