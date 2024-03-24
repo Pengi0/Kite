@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Sidebar, { SearchPlate } from "../components/Sidebar";
-import { isAlphaNum, send, toImg, validateEmail } from "../../lib/io";
+import { isAlphaNum, send, toBase64, toImg, validateEmail } from "../../lib/io";
 
 interface editProfileProps {
   edit: boolean;
@@ -53,20 +53,6 @@ export function Post() {
 function EditProfile(props: editProfileProps) {
   const [src, setSrc] = useState(toImg(props.pfp));
   const [er, setEr] = useState("");
-  function toBase64(file: File) {
-    return new Promise<string | undefined>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        let encoded = reader.result?.toString();
-        if (encoded && encoded.length % 4 > 0) {
-          encoded += "=".repeat(4 - (encoded.length % 4));
-        }
-        resolve(encoded);
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  }
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];

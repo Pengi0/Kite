@@ -1,10 +1,65 @@
 import { useState } from "react";
+import { send, toBase64, toImg } from "../../lib/io";
 
 interface props {
   setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  user: {
+    uid: number;
+    pass: string;
+  };
 }
 export default function CreatePost(props: props) {
   const [type, setType] = useState(0);
+  const [src, setSrc] = useState("");
+
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setSrc(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  function imageSubmit() {
+    const img = document.getElementById("file") as HTMLInputElement;
+    img.click();
+  }
+
+  async function submit() {
+    const img = document.getElementById("file") as HTMLInputElement;
+    console.log(img.files);
+
+    if (img.files?.length) {
+      let b64 = await toBase64(img.files[0]);
+
+      const x = {
+        type: "post-img",
+        base64: b64 ? b64.replace(/^data:(.*,)?/, "") : "",
+        img_type: img.files[0].type.replace("image/", ""),
+      };
+
+      var y = (await send(x)).loc;
+    } else {
+      if ((document.getElementById("Text") as HTMLInputElement).value == "") {
+        console.log("can't send");
+        return;
+      }
+      y = "";
+    }
+
+    const x1 = {
+      type: "create-post",
+      _id: props.user.uid,
+      _img: y,
+      _text: (document.getElementById("Text") as HTMLInputElement).value,
+    };
+
+    await send(x1);
+  }
+
   return (
     <div className="absolute z-30 w-screen h-screen ">
       <div className="bg-gray-300 absolute rounded-xl border-2 border-gray-200  w-1/2 h-[40rem] right-1/4 top-10 overflow-y-auto">
@@ -18,17 +73,34 @@ export default function CreatePost(props: props) {
         </span>
         <div className="text-2xl m-5">Create Post</div>
         <hr />
-        <div className="border border-dashed w-1/2 h-96 border-gray-600 mx-auto mt-10 flex justify-center rounded-xl">
-          <div>
-            <span className="material-symbols-rounded block text-7xl mt-36 mx-8">
-              photo_library
-            </span>
-            Click To Choose File
-          </div>
+        <div
+          onClick={imageSubmit}
+          className={
+            (src ? "" : "border-dashed") +
+            " border w-1/2 h-96 border-gray-600 mx-auto mt-10 flex justify-center rounded-xl"
+          }
+        >
+          <input
+            onChange={handleFileChange}
+            type="file"
+            id="file"
+            className="hidden"
+            accept="image/*"
+          />
+          {src != "" ? (
+            <img src={src} className="object-contain" />
+          ) : (
+            <div>
+              <span className="material-symbols-rounded block text-7xl mt-36 mx-8">
+                photo_library
+              </span>
+              Click To Choose File
+            </div>
+          )}
         </div>
         <textarea
-          id="EBio"
-          placeholder="Bio"
+          id="Text"
+          placeholder="Text"
           maxLength={255}
           className="relative translate-x-1/2 mt-5 p-3 w-1/2 h-40 text-xl resize-none rounded-xl bg-white hover:cursor-text hover:border-blue-500 border border-gray-500"
         />
@@ -53,7 +125,10 @@ export default function CreatePost(props: props) {
           ></div>
         </div>
         <br />
-        <button className="m-5 text-xl absolute right-24 -translate-y-24">
+        <button
+          onClick={submit}
+          className="m-5 text-xl absolute right-24 -translate-y-24"
+        >
           Save
         </button>
       </div>

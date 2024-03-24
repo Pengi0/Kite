@@ -37,5 +37,11 @@ SELECT UserProfiles._pfp, (SELECT _uname FROM UserAccounts WHERE _id = UserProfi
 -- Notifications
 CREATE TABLE Notifications (_id INT, FOREIGN KEY(_id) REFERENCES UserAccounts(_id), _date DATE, _msg CHAR(255), _read BOOL);
 DROP TABLE Notifications ;
-SELECT CONCAT(_msg, DATEDIFF(_date, CURDATE()), " days ago") FROM Notifications;
+SELECT CONCAT(_msg, DATEDIFF(_date, CURDATE()), " days ago"), _read FROM Notifications;
+SELECT * FROM Notifications;
 INSERT INTO Notifications VALUES (3, CURDATE(), "{data['_uname']} Started Following You. - ", FALSE);
+
+-- Posts
+CREATE TABLE Posts (_pid INT PRIMARY KEY AUTO_INCREMENT, _uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _img CHAR(255), _text TExT);
+DROP TABLE Posts;
+INSERT INTO Posts(_uid, _img, _text) VALUE (3, "", "acsdfsdgf");

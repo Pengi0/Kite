@@ -247,3 +247,13 @@ class dbase:
             return {'error': 0, '_data': x, '_unread': unread}
         except mysql.connector.Error as er:
             pass
+
+    def SavePost(self, data):
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO Posts(_uid, _img, _text) VALUE ({data['_id']}, "{data['_img']}", "{data['_text']}");
+            """)
+            self.connection.commit()
+            return {'error': 0}
+        except mysql.connector.Error as er:
+            return {'error':er.errno, 'msg': er.msg}

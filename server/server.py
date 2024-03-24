@@ -61,8 +61,9 @@ def handleRequest():
         x = dbase.GetRelations(data)
         print(x)
     elif data['type'] == 'get-notifications':
-        print(data)
         x = dbase.GetNotifications(data)
+    elif data['type'] == 'create-post':
+        x = dbase.SavePost(data)
     elif data['type'] == 'post-img':
         loc = save_img(data['base64'])
         x = {'error':0, 'loc': loc}

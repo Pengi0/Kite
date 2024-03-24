@@ -43,3 +43,18 @@ export function isAlphaNum(x: string) {
 export function toImg(x: string) {
     return config.ip+x
 }
+
+export function toBase64(file: File) {
+    return new Promise<string | undefined>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        let encoded = reader.result?.toString();
+        if (encoded && encoded.length % 4 > 0) {
+          encoded += "=".repeat(4 - (encoded.length % 4));
+        }
+        resolve(encoded);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  }

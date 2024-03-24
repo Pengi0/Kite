@@ -201,7 +201,9 @@ export default function Sidebar(props: sidebarProps) {
         setLoggedIn={props.setLoggedIn}
       />
       <NotificationMenu enabled={notificationEnabled} user={props.user} />
-      {createNewEnabled && <CreatePost setEnabled={setCreateNewEnabled} />}
+      {createNewEnabled && (
+        <CreatePost user={props.user} setEnabled={setCreateNewEnabled} />
+      )}
       <span className="fixed bg-gray-100 z-20 w-80 text-3xl h-full">
         <span className="material-symbols-rounded text-4xl w-full py-7 pl-5 hover:cursor-pointer bg-gray-300">
           KITE
