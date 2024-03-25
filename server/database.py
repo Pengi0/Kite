@@ -160,10 +160,16 @@ class dbase:
                 SELECT count(*) FROM FriendsRelationship WHERE _follower=(SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
             """)
             q = (self.cursor.fetchone())[0]
-        
+            self.cursor.execute(f"""
+                select * from Posts WHERE _uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+            """)
+            y = self.cursor.fetchall()
+
+            print({'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q,'_posts': y,  '_doesFollow': ('Following' if r != None else 'Follow')})
             
-            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q, '_doesFollow': ('Following' if r != None else 'Follow')}
+            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q,'_posts': y,  '_doesFollow': ('Following' if r != None else 'Follow')}
         except mysql.connector.Error as e:
+            print(e)
             return {'error':e.errno, 'msg':e.msg}
     
     def FollowRequest(self, data):

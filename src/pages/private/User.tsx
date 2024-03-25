@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar, { SearchPlate } from "../components/Sidebar";
-import { Post } from "./Profile";
+import { Post, TextPost } from "./Profile";
 import { useEffect, useState } from "react";
 import { send, toImg } from "../../lib/io";
 var received = false;
@@ -97,7 +97,11 @@ export default function User(props: userProps) {
   const [postNo, setPostNo] = useState(0);
   const [relationWindow, setRelationWindow] = useState(false);
   const [relationType, setRelationType] = useState("");
-
+  const [imgData, setImgData] = useState([] as (string | number)[][]);
+  const [msgData, setMsgData] = useState([] as (string | number)[][]);
+  var _imgData = [] as (string | number)[][];
+  var _msgData = [] as (string | number)[][];
+  var data = [];
   useEffect(() => {
     if (!received) {
       async function res() {
@@ -124,6 +128,15 @@ export default function User(props: userProps) {
         setFollowing(y._following);
         setButText(y._doesFollow);
 
+        data = y._posts as (string | number)[][];
+
+        data.forEach((element) => {
+          if (element[2] != "") _imgData.push(element);
+          else _msgData.push(element);
+        });
+        setImgData(_imgData);
+        setMsgData(_msgData);
+        // console.log(imgData, msgData);
         received = false;
       }
       res();
@@ -209,17 +222,42 @@ export default function User(props: userProps) {
         </div>
         <hr className="w-1/2 mb-5 mx-auto border-gray-700" />
         <div className="w-1/2 mb-5 mx-auto text-3xl">Posts - </div>
-
-        <div className="w-1/2 flex flex-col mx-auto">
-          <div className="flex flex-row">
-            <Post />
-            <Post />
-            <Post />
+        <div className="mx-auto flex justify-center">
+          <div className="w-1/2 inline-block text-xl">
+            {imgData.length == 0 && msgData.length == 0 && "No Posts Found"}
+            {imgData.map(
+              (
+                value: (string | number)[],
+                index: number,
+                array: (string | number)[][]
+              ) => {
+                if (index % 3 == 0)
+                  return (
+                    <div className=" flex flex-row">
+                      {index < array.length && (
+                        <Post key={value[0] + "P"} src={value[2]} />
+                      )}
+                      {index + 1 < array.length && (
+                        <Post
+                          key={array[index + 1][0] + "P"}
+                          src={array[index + 1][2]}
+                        />
+                      )}
+                      {index + 2 < array.length && (
+                        <Post
+                          key={array[index + 2][0] + "P"}
+                          src={array[index + 2][2]}
+                        />
+                      )}
+                    </div>
+                  );
+              }
+            )}
           </div>
-          <div className="flex flex-row">
-            <Post />
-            <Post />
-            <Post />
+          <div className="inline-block">
+            {msgData.map((value: (string | number)[]) => {
+              return <TextPost src={value[3].toString()} />;
+            })}
           </div>
         </div>
       </div>

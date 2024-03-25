@@ -59,7 +59,7 @@ export function Post(props: postProps) {
   );
 }
 
-function TextPost(props: textPostProps) {
+export function TextPost(props: textPostProps) {
   return (
     <div className="w-96 h-32 p-3 my-2 overflow-hidden rounded-xl text-white bg-gray-700">
       {props.src}
@@ -469,7 +469,7 @@ export default function Profile(props: profileProps) {
         <div className="w-1/2 mb-5 mx-auto text-3xl">Posts - </div>
         <div className="mx-auto flex justify-center">
           <div className="w-1/2 inline-block text-xl">
-            {data.length == 0 && "No Posts Found"}
+            {imgData.length == 0 && msgData.length == 0 && "No Posts Found"}
             {imgData.map(
               (
                 value: (string | number)[],
