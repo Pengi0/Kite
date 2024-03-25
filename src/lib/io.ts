@@ -3,9 +3,12 @@
 export const config = {
     ip: import.meta.env.VITE_DB_IP
 }
-
+var sent = false;
 export async function send(x: any) {
-
+l:
+    if(!sent)
+    {
+    sent = true;
     const sen = {
         method: 'POST',
         headers: {
@@ -17,12 +20,16 @@ export async function send(x: any) {
         const ret = await fetch(config.ip, sen)
         const data = await ret.json()
         console.log(data);
-        return data
+        sent = false;
+        return data;
     } 
     catch(error) {
         console.log('ERROR: ', error)
-        return null
+        sent = false;
+        return null;
     }
+}
+else return {error: -2}
 }
 
 export function validateEmail(email: string) {

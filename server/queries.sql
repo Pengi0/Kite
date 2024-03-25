@@ -43,6 +43,20 @@ INSERT INTO Notifications VALUES (3, CURDATE(), "{data['_uname']} Started Follow
 
 -- Posts
 CREATE TABLE Posts (_pid INT PRIMARY KEY AUTO_INCREMENT, _uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _img CHAR(255), _text TExT);
+ALTER TABLE Posts ADD _private INT DEFAULT 1;
 DROP TABLE Posts;
-select * from Posts ORDER BY RAND() ;
-INSERT INTO Posts(_uid, _img, _text) VALUE (3, "", "acsdfsdgf");
+SELECT * FROM Posts;
+SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+	INNER JOIN FriendsRelationship ON FriendsRelationship._following = Posts._uid
+    INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+    INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+    WHERE FriendsRelationship._follower = 3
+UNION
+SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+    INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+    INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+	WHERE _private = 0
+	ORDER BY RAND()
+	LIMIT 0,10;
+    
+CREATE TABLE PostLikes(_uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _pid INT, FOREIGN KEY(_pid) REFERENCES Posts(_pid) );

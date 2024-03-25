@@ -262,7 +262,7 @@ class dbase:
     def SavePost(self, data):
         try:
             self.cursor.execute(f"""
-                INSERT INTO Posts(_uid, _img, _text) VALUE ({data['_id']}, "{data['_img']}", "{data['_text']}");
+                INSERT INTO Posts(_uid, _img, _text, _private) VALUE ({data['_id']}, "{data['_img']}", "{data['_text']}", {data['_postType']});
             """)
             self.connection.commit()
             return {'error': 0}
@@ -276,5 +276,28 @@ class dbase:
             """)
             self.connection.commit()
             return {'error': 0}
+        except mysql.connector.Error as er:
+            return {'error': er.errno, 'msg': er.msg}
+
+    def GetHomePosts(self, data):
+        try:
+            self.cursor.execute(f"""
+                SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+                	INNER JOIN FriendsRelationship ON FriendsRelationship._following = Posts._uid
+                    INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+                    INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+                    WHERE FriendsRelationship._follower = 3
+                 UNION
+                SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+                    INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+                    INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+                	WHERE _private = 0
+                	ORDER BY RAND()
+                	LIMIT 0,10;
+            """)
+            y = self.cursor.fetchall()
+
+            return {'error': 0, '_data': y}
+            
         except mysql.connector.Error as er:
             return {'error': er.errno, 'msg': er.msg}

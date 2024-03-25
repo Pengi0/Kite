@@ -1,4 +1,5 @@
-import { toImg } from "../../lib/io";
+import { useEffect, useState } from "react";
+import { send, toImg } from "../../lib/io";
 import Sidebar from "../components/Sidebar";
 
 interface homeProps {
@@ -15,32 +16,40 @@ interface homeProps {
   setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface postProps {
-  postId: number;
+interface postPros {
+  src: string | number;
+  pid: number;
+  text: string;
+  pfp: string;
+  uname: string;
 }
 
-function Post(props: postProps) {
-  const src =
-    "https://t4.ftcdn.net/jpg/04/96/04/41/360_F_496044111_NtgcQqusPMz0AaxtBCDu5L8FifGQDkig.jpg";
-  const text = "";
-
+export function Post(props: postPros) {
   return (
-    <div className="w-96 p-3 rounded-xl bg-gray-400">
+    <div className="w-[32rem] p-3 m-3 rounded-xl top-10 bg-gray-400">
       <div className="mb-3">
         <img
-          src={toImg("def/pfp")}
+          src={toImg(props.pfp)}
           className="w-20 h-20 mr-3 inline-block rounded-full object-cover"
         />
         <div className=" inline-block relative translate-y-2 text-white ">
-          <div className="text-xl">User Name</div>
-          <div>Date</div>
+          <div className="text-xl">{props.uname}</div>
+          <div className="opacity-0">.</div>
         </div>
+        <span className="material-symbols-rounded absolute right-3 pr-3 w-14 h-14 p-1 text-5xl text-white hover:cursor-pointer hover:bg-gray-800 rounded-full">
+          close
+        </span>
       </div>
       <hr />
       <div className="text-white">
-        {src && <img src={src} className="h-min w-96 mx-auto object-contain" />}
+        {props.src && (
+          <img
+            src={toImg(props.src as string)}
+            className="h-min w-96 mx-auto object-contain"
+          />
+        )}
         <hr />
-        {text}
+        {props.text}
       </div>
       <hr />
       <div className="mt-3 text-white">
@@ -62,6 +71,24 @@ function Post(props: postProps) {
 }
 
 export default function Home(props: homeProps) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fun() {
+      const x = {
+        type: "get-home-post",
+        _id: props.user.uid,
+      };
+      const y = await send(x);
+      if (y.error == -2) {
+        setTimeout(async () => await fun(), 100);
+        return;
+      }
+      setData(y._data);
+    }
+    fun();
+  }, []);
+
   return (
     <>
       <Sidebar
@@ -79,7 +106,18 @@ export default function Home(props: homeProps) {
           </div>
         </div>
         <div className="mx-auto w-min mt-14">
-          <Post postId={0} />
+          {data.map((el: any) => {
+            return (
+              <Post
+                pid={el[0]}
+                key={el[0]}
+                src={el[2]}
+                text={el[3]}
+                pfp={el[6]}
+                uname={el[5]}
+              />
+            );
+          })}
         </div>
       </div>
     </>
