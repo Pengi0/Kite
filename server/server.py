@@ -68,6 +68,12 @@ def handleRequest():
         x = dbase.DeletePost(data)
     elif data['type'] == 'get-home-post':
         x = dbase.GetHomePosts(data)
+    elif data['type'] == 'like-post':
+        x = dbase.LikePost(data)
+    elif data['type'] == 'save-post':
+        x = dbase.SavePost(data)
+    elif data['type'] == 'get-like-and-save':
+        x = dbase.GetLikeAndSave(data)
     elif data['type'] == 'post-img':
         loc = save_img(data['base64'])
         x = {'error':0, 'loc': loc}

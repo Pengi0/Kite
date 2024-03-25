@@ -83,7 +83,10 @@ class dbase:
             """)
             q = (self.cursor.fetchone())[0]
             self.cursor.execute(f"""
-                select * from Posts WHERE _uid = {data['_id']};
+                select Posts.*, PostLikes._uid = {data['_id']} as liked, PostSaves._uid = {data['_id']} as saved from Posts 
+                LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
+                LEFT JOIN PostSaves ON Posts._pid = PostSaves._pid
+                WHERE Posts._uid = {data['_id']};
             """)
             y = self.cursor.fetchall()
 
@@ -161,7 +164,10 @@ class dbase:
             """)
             q = (self.cursor.fetchone())[0]
             self.cursor.execute(f"""
-                select * from Posts WHERE _uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+                select Posts.*, PostLikes._uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}") as liked, PostSaves._uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}") as saved from Posts 
+                LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
+                LEFT JOIN PostSaves ON Posts._pid = PostSaves._pid
+                WHERE Posts._uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
             """)
             y = self.cursor.fetchall()
 
@@ -190,7 +196,7 @@ class dbase:
                     DELETE FROM FriendsRelationship WHERE _follower = {data['_id']} AND _following = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
                 """)
                 self.connection.commit()
-                return {'error': 0, 'action': 'Follow'}                
+                return {'error': 0, '_action': 'Follow'}                
             return {'error':e.errno, 'msg':e.msg}
     
     def GetRelations(self, data):
@@ -282,22 +288,56 @@ class dbase:
     def GetHomePosts(self, data):
         try:
             self.cursor.execute(f"""
-                SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
-                	INNER JOIN FriendsRelationship ON FriendsRelationship._following = Posts._uid
+                SELECT x.*, PostLikes._uid = {data['_id']} as liked, PostSaves._uid = {data['_id']} as saved FROM (SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+	                INNER JOIN FriendsRelationship ON FriendsRelationship._following = Posts._uid
                     INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
                     INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
-                    WHERE FriendsRelationship._follower = 3
-                 UNION
-                SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
+                    WHERE FriendsRelationship._follower = {data['_id']}
+	                UNION
+	                SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp from Posts
                     INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
                     INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
-                	WHERE _private = 0
-                	ORDER BY RAND()
-                	LIMIT 0,10;
+	                WHERE _private = 0)x
+                    LEFT JOIN PostLikes ON PostLikes._pid = x._pid
+                    LEFT JOIN PostSaves ON PostSaves._pid = x._pid
+	                ORDER BY RAND()
+	                LIMIT 0,10;
             """)
             y = self.cursor.fetchall()
 
             return {'error': 0, '_data': y}
             
         except mysql.connector.Error as er:
+            return {'error': er.errno, 'msg': er.msg}
+
+    def LikePost(self, data):
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO PostLikes VALUE ({data['_uid']}, {data['_pid']})
+            """)
+            self.connection.commit()
+            return {'error': 0}
+        except mysql.connector.Error as er:
+            if(er.errno == 1062):
+                self.cursor.execute(f"""
+                    DELETE FROM PostLikes WHERE _uid = {data['_uid']} AND _pid = {data['_pid']}
+                """)
+                self.connection.commit()
+                return {'error': 0}
+            return {'error': er.errno, 'msg': er.msg}
+
+    def SavePost(self, data):
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO PostSaves VALUE ({data['_uid']}, {data['_pid']})
+            """)
+            self.connection.commit()
+            return {'error': 0}
+        except mysql.connector.Error as er:
+            if(er.errno == 1062):
+                self.cursor.execute(f"""
+                    DELETE FROM PostSaves WHERE _uid = {data['_uid']} AND _pid = {data['_pid']}
+                """)
+                self.connection.commit()
+                return {'error': 0}
             return {'error': er.errno, 'msg': er.msg}

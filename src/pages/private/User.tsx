@@ -147,6 +147,7 @@ export default function User(props: userProps) {
     const y = await send(x);
     if (y.error == 0) {
       setButText(y._action);
+      console.log(y._action);
     }
   }
 
@@ -231,35 +232,44 @@ export default function User(props: userProps) {
                     <div className=" flex flex-row">
                       {index < array.length && (
                         <Post
-                          key={value[0] + "P"}
+                          user={props.user}
+                          key={index + "P"}
                           src={value[2]}
                           pid={value[0] as number}
                           text={value[3] as string}
                           uname={uName as string}
                           pfp={image}
                           own={false}
+                          saved={value[6] != null}
+                          liked={value[5] != null}
                         />
                       )}
                       {index + 1 < array.length && (
                         <Post
-                          key={array[index + 1][0] + "P"}
+                          user={props.user}
+                          key={index + 1 + "P"}
                           src={array[index + 1][2]}
                           pid={array[index + 1][0] as number}
                           text={array[index + 1][3] as string}
                           uname={uName as string}
                           pfp={image}
                           own={false}
+                          saved={array[index + 1][6] != null}
+                          liked={array[index + 1][5] != null}
                         />
                       )}
                       {index + 2 < array.length && (
                         <Post
-                          key={array[index + 2][0] + "P"}
+                          user={props.user}
+                          key={index + 2 + "P"}
                           src={array[index + 2][2]}
                           pid={array[index + 2][0] as number}
                           text={array[index + 2][3] as string}
                           uname={uName as string}
                           pfp={image}
                           own={false}
+                          saved={array[index + 2][6] != null}
+                          liked={array[index + 2][5] != null}
                         />
                       )}
                     </div>
@@ -268,16 +278,19 @@ export default function User(props: userProps) {
             )}
           </div>
           <div className="inline-block">
-            {msgData.map((value: (string | number)[]) => {
+            {msgData.map((value: (string | number)[], index: number) => {
               return (
                 <TextPost
-                  key={value[0] + "P"}
+                  user={props.user}
+                  key={index}
                   pid={value[0] as number}
                   text={value[3] as string}
                   src={value[2]}
                   uname={uName as string}
                   pfp={image}
                   own={true}
+                  saved={value[6] != null}
+                  liked={value[5] != null}
                 />
               );
             })}

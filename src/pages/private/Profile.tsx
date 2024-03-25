@@ -40,14 +40,18 @@ interface relationProps {
   setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface postProps {
+  user: any;
   src: string | number;
   pid: number;
   text: string;
   pfp: string;
   uname: string;
   own: boolean;
+  saved: boolean;
+  liked: boolean;
 }
 interface postPanelPros {
+  user: any;
   src: string | number;
   pid: number;
   text: string;
@@ -55,11 +59,34 @@ interface postPanelPros {
   uname: string;
   own: boolean;
   setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  liked: boolean;
+  saved: boolean;
 }
 
 var EditSend = false;
 
 export function PostPanel(props: postPanelPros) {
+  const [saved, setSaved] = useState(props.saved);
+  const [liked, setLiked] = useState(props.liked);
+  async function likedChange() {
+    const x = {
+      type: "like-post",
+      _uid: props.user.uid,
+      _pid: props.pid,
+    };
+    const y = await send(x);
+    setLiked(!liked);
+  }
+  async function saveChange() {
+    const x = {
+      type: "save-post",
+      _uid: props.user.uid,
+      _pid: props.pid,
+    };
+    const y = await send(x);
+    setSaved(!saved);
+  }
+
   async function deletePost() {
     const x = {
       type: "delete-post",
@@ -100,14 +127,30 @@ export function PostPanel(props: postPanelPros) {
         </div>
         <hr />
         <div className="mt-3 text-white">
-          <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
-            <span className="material-symbols-rounded pr-3 text-3xl">
+          <div
+            onClick={likedChange}
+            className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100"
+          >
+            <span
+              className={
+                "material-symbols-rounded pr-3 text-3xl " +
+                (liked && "text-blue-500")
+              }
+            >
               thumb_up
             </span>
             <div className="inline-block relative -translate-y-2">Like</div>
           </div>
-          <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
-            <span className="material-symbols-rounded pr-3 text-3xl">
+          <div
+            onClick={saveChange}
+            className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100"
+          >
+            <span
+              className={
+                "material-symbols-rounded pr-3 text-3xl " +
+                (saved && "text-blue-500")
+              }
+            >
               Bookmark
             </span>
             <div className="inline-block relative -translate-y-2">Save</div>
@@ -134,6 +177,7 @@ export function Post(props: postProps) {
     <>
       {enabled && (
         <PostPanel
+          user={props.user}
           setEnabled={setEnabled}
           pid={props.pid}
           text={props.text}
@@ -141,6 +185,8 @@ export function Post(props: postProps) {
           pfp={props.pfp}
           uname={props.uname}
           own={props.own}
+          liked={props.liked}
+          saved={props.saved}
         />
       )}
 
@@ -163,6 +209,7 @@ export function TextPost(props: postProps) {
     <>
       {enabled && (
         <PostPanel
+          user={props.user}
           setEnabled={setEnabled}
           pid={props.pid}
           text={props.text}
@@ -170,6 +217,8 @@ export function TextPost(props: postProps) {
           pfp={props.pfp}
           uname={props.uname}
           own={props.own}
+          saved={props.saved}
+          liked={props.liked}
         />
       )}
       <div
@@ -588,35 +637,44 @@ export default function Profile(props: profileProps) {
                     <div className=" flex flex-row">
                       {index < array.length && (
                         <Post
-                          key={value[0] + "P"}
+                          user={props.user}
+                          key={index + "P"}
                           pid={value[0] as number}
                           text={value[3] as string}
                           src={value[2]}
                           uname={uName}
                           pfp={image}
                           own={true}
+                          saved={value[6] != null}
+                          liked={value[5] != null}
                         />
                       )}
                       {index + 1 < array.length && (
                         <Post
-                          key={array[index + 1][0] + "P"}
+                          user={props.user}
+                          key={index + 1 + "P"}
                           src={array[index + 1][2]}
                           pid={array[index + 1][0] as number}
                           text={array[index + 1][3] as string}
                           uname={uName}
                           own={true}
                           pfp={image}
+                          saved={value[6] != null}
+                          liked={value[5] != null}
                         />
                       )}
                       {index + 2 < array.length && (
                         <Post
-                          key={array[index + 2][0] + "P"}
+                          user={props.user}
+                          key={index + 2 + "P"}
                           src={array[index + 2][2]}
                           pid={array[index + 2][0] as number}
                           text={array[index + 2][3] as string}
                           uname={uName}
                           pfp={image}
                           own={true}
+                          saved={value[6] != null}
+                          liked={value[5] != null}
                         />
                       )}
                     </div>
@@ -625,16 +683,19 @@ export default function Profile(props: profileProps) {
             )}
           </div>
           <div className="inline-block">
-            {msgData.map((value: (string | number)[]) => {
+            {msgData.map((value: (string | number)[], index: number) => {
               return (
                 <TextPost
-                  key={value[0] + "P"}
+                  user={props.user}
+                  key={index}
                   pid={value[0] as number}
                   text={value[3] as string}
                   src={value[2]}
                   uname={uName}
                   pfp={image}
                   own={true}
+                  saved={value[6] == 1}
+                  liked={value[5] == 1}
                 />
               );
             })}

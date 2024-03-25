@@ -20,7 +20,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   return (
-    <main className="w-svw h-svh">
+    <main className="w-svw h-svh overflow-x-hidden">
       <hr className="border-0" />
       <Routes>
         <Route element={<Auth condition={loggedIn} path="/" />}>
