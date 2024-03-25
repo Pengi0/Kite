@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { send, toBase64, toImg } from "../../lib/io";
+import { send, toBase64 } from "../../lib/io";
 
 interface props {
   setEnabled: React.Dispatch<React.SetStateAction<boolean>>;

@@ -4,7 +4,6 @@ import { Post, TextPost } from "./Profile";
 import { useEffect, useState } from "react";
 import { send, toImg } from "../../lib/io";
 var received = false;
-var gotData = false;
 interface userProps {
   setUser: React.Dispatch<
     React.SetStateAction<{

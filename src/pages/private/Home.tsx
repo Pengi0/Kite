@@ -27,9 +27,12 @@ interface postPros {
   saved: boolean;
   mid: boolean;
   alert: number;
+  data: never[];
+  setData: React.Dispatch<React.SetStateAction<never[]>>;
 }
 var alertNo = -1;
 var alertArr = [] as number[];
+var index = 0;
 export function Post(props: postPros) {
   const [saved, setSaved] = useState(props.saved);
   const [liked, setLiked] = useState(props.liked);
@@ -39,7 +42,7 @@ export function Post(props: postPros) {
       _uid: props.user.uid,
       _pid: props.pid,
     };
-    const y = await send(x);
+    await send(x);
     setLiked(!liked);
   }
   async function saveChange() {
@@ -48,7 +51,7 @@ export function Post(props: postPros) {
       _uid: props.user.uid,
       _pid: props.pid,
     };
-    const y = await send(x);
+    await send(x);
     setSaved(!saved);
   }
 
@@ -58,11 +61,20 @@ export function Post(props: postPros) {
     if (props.mid && alertArr[props.alert] < 2) {
       alertArr[props.alert]++;
       if (alertArr[props.alert] == 1) {
-        console.log("ggs");
+        async function fun() {
+          const x = {
+            type: "get-home-post",
+            _id: props.user.uid,
+          };
+          const y = await send(x);
+          if (y.error == -2) {
+            setTimeout(async () => await fun(), 100);
+            return;
+          }
+          props.setData(props.data.concat(y._data));
+        }
+        fun();
       }
-      console.log(alertArr);
-      console.log(props.alert);
-      console.log(alertArr[props.alert]);
     }
   }, [isVisible]);
 
@@ -162,7 +174,7 @@ export default function Home(props: homeProps) {
         <div className="mx-auto w-min mt-14">
           {data.map((el: any, index: number, arr: never[]) => {
             var alert_ = -1;
-            if (index == Math.floor(arr.length / 2) || index == 7) {
+            if (index == Math.floor(arr.length / 2)) {
               alertNo++;
               alertArr.push(-1);
               alert_ = alertNo;
@@ -171,7 +183,7 @@ export default function Home(props: homeProps) {
             return (
               <Post
                 pid={el[0]}
-                key={el[0]}
+                key={index++}
                 src={el[2]}
                 text={el[3]}
                 pfp={el[6]}
@@ -180,7 +192,9 @@ export default function Home(props: homeProps) {
                 saved={el[8]}
                 liked={el[7]}
                 alert={alert_}
-                mid={index == Math.floor(arr.length / 2) || index == 7}
+                data={data}
+                setData={setData}
+                mid={index == Math.floor(arr.length / 2)}
               />
             );
           })}

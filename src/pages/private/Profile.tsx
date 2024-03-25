@@ -74,7 +74,7 @@ export function PostPanel(props: postPanelPros) {
       _uid: props.user.uid,
       _pid: props.pid,
     };
-    const y = await send(x);
+    await send(x);
     setLiked(!liked);
   }
   async function saveChange() {
@@ -83,7 +83,7 @@ export function PostPanel(props: postPanelPros) {
       _uid: props.user.uid,
       _pid: props.pid,
     };
-    const y = await send(x);
+    await send(x);
     setSaved(!saved);
   }
 
@@ -92,7 +92,7 @@ export function PostPanel(props: postPanelPros) {
       type: "delete-post",
       _pid: props.pid,
     };
-    const y = send(x);
+    send(x);
     props.setEnabled(false);
   }
   return (
