@@ -44,7 +44,7 @@ function Relations(props: relationProps) {
     }
 
     fun();
-  });
+  }, []);
 
   return (
     <div className={"absolute z-20 w-screen h-screen "}>
@@ -103,45 +103,40 @@ export default function User(props: userProps) {
   var _msgData = [] as (string | number)[][];
   var data = [];
   useEffect(() => {
-    if (!received) {
-      async function res() {
-        received = true;
-        const x = {
-          type: "get-others-profile",
-          _id: props.user.uid,
-          _uname: uName,
-        };
+    async function res() {
+      const x = {
+        type: "get-others-profile",
+        _id: props.user.uid,
+        _uname: uName,
+      };
 
-        const y = await send(x);
+      const y = await send(x);
 
-        if (y.error != 0) {
-          console.log("error");
-          return;
-        }
-        if (uName == y._uname) {
-          navigate("/profile");
-        }
-        setRName(y._rname);
-        setBio(y._bio);
-        setImage(y._pfp);
-        setFollower(y._follower);
-        setFollowing(y._following);
-        setButText(y._doesFollow);
-
-        data = y._posts as (string | number)[][];
-
-        data.forEach((element) => {
-          if (element[2] != "") _imgData.push(element);
-          else _msgData.push(element);
-        });
-        setImgData(_imgData);
-        setMsgData(_msgData);
-        // console.log(imgData, msgData);
-        received = false;
+      if (y.error != 0) {
+        console.log("error");
+        return;
       }
-      res();
+      if (uName == y._uname) {
+        navigate("/profile");
+      }
+      setRName(y._rname);
+      setBio(y._bio);
+      setImage(y._pfp);
+      setFollower(y._follower);
+      setFollowing(y._following);
+      setButText(y._doesFollow);
+
+      data = y._posts as (string | number)[][];
+
+      data.forEach((element) => {
+        if (element[2] != "") _imgData.push(element);
+        else _msgData.push(element);
+      });
+      setImgData(_imgData);
+      setMsgData(_msgData);
     }
-  });
+    res();
+  }, []);
 
   async function followReq() {
     const x = {
@@ -235,18 +230,36 @@ export default function User(props: userProps) {
                   return (
                     <div className=" flex flex-row">
                       {index < array.length && (
-                        <Post key={value[0] + "P"} src={value[2]} />
+                        <Post
+                          key={value[0] + "P"}
+                          src={value[2]}
+                          pid={value[0] as number}
+                          text={value[3] as string}
+                          uname={uName as string}
+                          pfp={image}
+                          own={false}
+                        />
                       )}
                       {index + 1 < array.length && (
                         <Post
                           key={array[index + 1][0] + "P"}
                           src={array[index + 1][2]}
+                          pid={array[index + 1][0] as number}
+                          text={array[index + 1][3] as string}
+                          uname={uName as string}
+                          pfp={image}
+                          own={false}
                         />
                       )}
                       {index + 2 < array.length && (
                         <Post
                           key={array[index + 2][0] + "P"}
                           src={array[index + 2][2]}
+                          pid={array[index + 2][0] as number}
+                          text={array[index + 2][3] as string}
+                          uname={uName as string}
+                          pfp={image}
+                          own={false}
                         />
                       )}
                     </div>
@@ -256,7 +269,17 @@ export default function User(props: userProps) {
           </div>
           <div className="inline-block">
             {msgData.map((value: (string | number)[]) => {
-              return <TextPost src={value[3].toString()} />;
+              return (
+                <TextPost
+                  key={value[0] + "P"}
+                  pid={value[0] as number}
+                  text={value[3] as string}
+                  src={value[2]}
+                  uname={uName as string}
+                  pfp={image}
+                  own={true}
+                />
+              );
             })}
           </div>
         </div>

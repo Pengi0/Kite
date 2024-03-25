@@ -41,29 +41,144 @@ interface relationProps {
 }
 interface postProps {
   src: string | number;
+  pid: number;
+  text: string;
+  pfp: string;
+  uname: string;
+  own: boolean;
 }
-interface textPostProps {
-  src: string;
+interface postPanelPros {
+  src: string | number;
+  pid: number;
+  text: string;
+  pfp: string;
+  uname: string;
+  own: boolean;
+  setEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
-var useEffectOn = false;
+
 var EditSend = false;
-export function Post(props: postProps) {
+
+export function PostPanel(props: postPanelPros) {
+  async function deletePost() {
+    const x = {
+      type: "delete-post",
+      _pid: props.pid,
+    };
+    const y = send(x);
+    props.setEnabled(false);
+  }
   return (
-    <div className="w-60 aspect-square rounded-2xl m-2 bg-gray-600 hover:cursor-pointer hover:m-0 hover:w-64 transition-all">
-      <img
-        src={toImg(props.src.toString())}
-        className="rounded-2xl object-cover w-full"
-      />
-      {/* <div className="m-5 text-white">{props.src}</div> */}
+    <div className={"absolute z-50 w-screen h-screen right-0 top-0"}>
+      <div className="w-[40rem] p-3 rounded-xl fixed right-1/3 top-10 bg-gray-400">
+        <div className="mb-3">
+          <img
+            src={toImg(props.pfp)}
+            className="w-20 h-20 mr-3 inline-block rounded-full object-cover"
+          />
+          <div className=" inline-block relative translate-y-2 text-white ">
+            <div className="text-xl">{props.uname}</div>
+            <div className="opacity-0">.</div>
+          </div>
+          <span
+            onClick={() => props.setEnabled(false)}
+            className="material-symbols-rounded absolute right-3 pr-3 w-14 h-14 p-1 text-5xl text-white hover:cursor-pointer hover:bg-gray-800 rounded-full"
+          >
+            close
+          </span>
+        </div>
+        <hr />
+        <div className="text-white">
+          {props.src && (
+            <img
+              src={toImg(props.src as string)}
+              className="h-min w-96 mx-auto object-contain"
+            />
+          )}
+          <hr />
+          {props.text}
+        </div>
+        <hr />
+        <div className="mt-3 text-white">
+          <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
+            <span className="material-symbols-rounded pr-3 text-3xl">
+              thumb_up
+            </span>
+            <div className="inline-block relative -translate-y-2">Like</div>
+          </div>
+          <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
+            <span className="material-symbols-rounded pr-3 text-3xl">
+              Bookmark
+            </span>
+            <div className="inline-block relative -translate-y-2">Save</div>
+          </div>
+          {props.own && (
+            <div
+              onClick={deletePost}
+              className="inline-block ml-32 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100"
+            >
+              <span className="material-symbols-rounded pr-3 text-3xl">
+                Delete
+              </span>
+              <div className="inline-block relative -translate-y-2">Delete</div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
-
-export function TextPost(props: textPostProps) {
+export function Post(props: postProps) {
+  const [enabled, setEnabled] = useState(false);
   return (
-    <div className="w-96 h-32 p-3 my-2 overflow-hidden rounded-xl text-white bg-gray-700">
-      {props.src}
-    </div>
+    <>
+      {enabled && (
+        <PostPanel
+          setEnabled={setEnabled}
+          pid={props.pid}
+          text={props.text}
+          src={props.src}
+          pfp={props.pfp}
+          uname={props.uname}
+          own={props.own}
+        />
+      )}
+
+      <div
+        onClick={() => setEnabled(true)}
+        className="w-60 aspect-square rounded-2xl m-2 bg-gray-600 hover:cursor-pointer hover:m-0 hover:w-64 transition-all"
+      >
+        <img
+          src={toImg(props.src.toString())}
+          className="rounded-2xl object-cover w-full h-full"
+        />
+      </div>
+    </>
+  );
+}
+
+export function TextPost(props: postProps) {
+  const [enabled, setEnabled] = useState(false);
+  return (
+    <>
+      {enabled && (
+        <PostPanel
+          setEnabled={setEnabled}
+          pid={props.pid}
+          text={props.text}
+          src={props.src}
+          pfp={props.pfp}
+          uname={props.uname}
+          own={props.own}
+        />
+      )}
+      <div
+        onClick={() => setEnabled(true)}
+        className="w-96 h-32 p-3 my-2 overflow-hidden hover:cursor-pointer rounded-xl text-white bg-gray-700"
+      >
+        {props.text}
+      </div>
+    </>
   );
 }
 function EditProfile(props: editProfileProps) {
@@ -293,22 +408,18 @@ function Relations(props: relationProps) {
 
   useEffect(() => {
     async function fun() {
-      if (!useEffectOn) {
-        useEffectOn = true;
-        const x = {
-          type: "get-relations",
-          _get: props.type,
-          _id: props.user.uid,
-          _useUname: false,
-        };
-        const y = await send(x);
-        setData(y.data);
-        useEffectOn = false;
-      }
+      const x = {
+        type: "get-relations",
+        _get: props.type,
+        _id: props.user.uid,
+        _useUname: false,
+      };
+      const y = await send(x);
+      setData(y.data);
     }
 
     fun();
-  });
+  }, []);
 
   return (
     <div className={"absolute z-20 w-screen h-screen "}>
@@ -358,38 +469,34 @@ export default function Profile(props: profileProps) {
   var data = [];
   useEffect(() => {
     async function fun() {
-      if (!useEffectOn) {
-        useEffectOn = true;
-        const x = {
-          type: "get-profile",
-          _id: props.user.uid,
-          _pass: props.user.pass,
-        };
-        const y = await send(x);
+      const x = {
+        type: "get-profile",
+        _id: props.user.uid,
+        _pass: props.user.pass,
+      };
+      const y = await send(x);
 
-        setUname(y._uname);
-        setRName(y._rname);
-        setBio(y._bio);
-        setImage(y._pfp);
-        setEmail(y._email);
-        setFollower(y._follower);
-        setFollowing(y._following);
+      setUname(y._uname);
+      setRName(y._rname);
+      setBio(y._bio);
+      setImage(y._pfp);
+      setEmail(y._email);
+      setFollower(y._follower);
+      setFollowing(y._following);
 
-        data = y._posts as (string | number)[][];
+      data = y._posts as (string | number)[][];
 
-        data.forEach((element) => {
-          if (element[2] != "") _imgData.push(element);
-          else _msgData.push(element);
-        });
-        setImgData(_imgData);
-        setMsgData(_msgData);
-        console.log(imgData, msgData);
-        useEffectOn = false;
-      }
+      data.forEach((element) => {
+        if (element[2] != "") _imgData.push(element);
+        else _msgData.push(element);
+      });
+      setImgData(_imgData);
+      setMsgData(_msgData);
+      console.log(imgData, msgData);
     }
 
     fun();
-  });
+  }, []);
 
   return (
     <>
@@ -480,18 +587,36 @@ export default function Profile(props: profileProps) {
                   return (
                     <div className=" flex flex-row">
                       {index < array.length && (
-                        <Post key={value[0] + "P"} src={value[2]} />
+                        <Post
+                          key={value[0] + "P"}
+                          pid={value[0] as number}
+                          text={value[3] as string}
+                          src={value[2]}
+                          uname={uName}
+                          pfp={image}
+                          own={true}
+                        />
                       )}
                       {index + 1 < array.length && (
                         <Post
                           key={array[index + 1][0] + "P"}
                           src={array[index + 1][2]}
+                          pid={array[index + 1][0] as number}
+                          text={array[index + 1][3] as string}
+                          uname={uName}
+                          own={true}
+                          pfp={image}
                         />
                       )}
                       {index + 2 < array.length && (
                         <Post
                           key={array[index + 2][0] + "P"}
                           src={array[index + 2][2]}
+                          pid={array[index + 2][0] as number}
+                          text={array[index + 2][3] as string}
+                          uname={uName}
+                          pfp={image}
+                          own={true}
                         />
                       )}
                     </div>
@@ -501,7 +626,17 @@ export default function Profile(props: profileProps) {
           </div>
           <div className="inline-block">
             {msgData.map((value: (string | number)[]) => {
-              return <TextPost src={value[3].toString()} />;
+              return (
+                <TextPost
+                  key={value[0] + "P"}
+                  pid={value[0] as number}
+                  text={value[3] as string}
+                  src={value[2]}
+                  uname={uName}
+                  pfp={image}
+                  own={true}
+                />
+              );
             })}
           </div>
         </div>

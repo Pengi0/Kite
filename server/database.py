@@ -268,3 +268,13 @@ class dbase:
             return {'error': 0}
         except mysql.connector.Error as er:
             return {'error':er.errno, 'msg': er.msg}
+
+    def DeletePost(self, data):
+        try:
+            self.cursor.execute(f"""
+                DELETE FROM Posts WHERE _pid = {data['_pid']};
+            """)
+            self.connection.commit()
+            return {'error': 0}
+        except mysql.connector.Error as er:
+            return {'error': er.errno, 'msg': er.msg}

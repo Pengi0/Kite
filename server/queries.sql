@@ -44,4 +44,5 @@ INSERT INTO Notifications VALUES (3, CURDATE(), "{data['_uname']} Started Follow
 -- Posts
 CREATE TABLE Posts (_pid INT PRIMARY KEY AUTO_INCREMENT, _uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _img CHAR(255), _text TExT);
 DROP TABLE Posts;
+select * from Posts ORDER BY RAND() ;
 INSERT INTO Posts(_uid, _img, _text) VALUE (3, "", "acsdfsdgf");

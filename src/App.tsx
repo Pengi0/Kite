@@ -18,6 +18,7 @@ const userProp = {
 function App() {
   const [user, setUser] = useState(userProp);
   const [loggedIn, setLoggedIn] = useState(false);
+
   return (
     <main className="w-svw h-svh">
       <hr className="border-0" />

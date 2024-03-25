@@ -64,6 +64,8 @@ def handleRequest():
         x = dbase.GetNotifications(data)
     elif data['type'] == 'create-post':
         x = dbase.SavePost(data)
+    elif data['type'] == 'delete-post':
+        x = dbase.DeletePost(data)
     elif data['type'] == 'post-img':
         loc = save_img(data['base64'])
         x = {'error':0, 'loc': loc}

@@ -58,6 +58,7 @@ export default function CreatePost(props: props) {
     };
 
     await send(x1);
+    props.setEnabled(false);
   }
 
   return (

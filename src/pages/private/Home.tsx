@@ -44,13 +44,13 @@ function Post(props: postProps) {
       </div>
       <hr />
       <div className="mt-3 text-white">
-        <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-400 hover:cursor-pointer transition-all duration-100">
+        <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
           <span className="material-symbols-rounded pr-3 text-3xl">
             thumb_up
           </span>
           <div className="inline-block relative -translate-y-2">Like</div>
         </div>
-        <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-400 hover:cursor-pointer transition-all duration-100">
+        <div className="inline-block mx-5 px-4 py-2 rounded-xl hover:bg-gray-500 hover:cursor-pointer transition-all duration-100">
           <span className="material-symbols-rounded pr-3 text-3xl">
             Bookmark
           </span>
