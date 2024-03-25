@@ -32,7 +32,7 @@ interface postPros {
 }
 var alertNo = -1;
 var alertArr = [] as number[];
-var index = 0;
+var indx = 0;
 export function Post(props: postPros) {
   const [saved, setSaved] = useState(props.saved);
   const [liked, setLiked] = useState(props.liked);
@@ -183,7 +183,7 @@ export default function Home(props: homeProps) {
             return (
               <Post
                 pid={el[0]}
-                key={index++}
+                key={indx++}
                 src={el[2]}
                 text={el[3]}
                 pfp={el[6]}

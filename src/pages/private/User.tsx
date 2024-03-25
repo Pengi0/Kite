@@ -124,6 +124,7 @@ export default function User(props: userProps) {
       setFollower(y._follower);
       setFollowing(y._following);
       setButText(y._doesFollow);
+      setPostNo(y._postCount);
 
       data = y._posts as (string | number)[][];
 

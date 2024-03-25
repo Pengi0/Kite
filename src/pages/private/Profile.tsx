@@ -532,6 +532,7 @@ export default function Profile(props: profileProps) {
       setEmail(y._email);
       setFollower(y._follower);
       setFollowing(y._following);
+      setPostNo(y._postCount);
 
       data = y._posts as (string | number)[][];
 

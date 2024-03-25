@@ -83,6 +83,10 @@ class dbase:
             """)
             q = (self.cursor.fetchone())[0]
             self.cursor.execute(f"""
+                SELECT count(*) FROM Posts WHERE _uid={data['_id']};
+            """)
+            p = (self.cursor.fetchone())[0]
+            self.cursor.execute(f"""
                 select Posts.*, PostLikes._uid = {data['_id']} as liked, PostSaves._uid = {data['_id']} as saved from Posts 
                 LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
                 LEFT JOIN PostSaves ON Posts._pid = PostSaves._pid
@@ -91,7 +95,7 @@ class dbase:
             y = self.cursor.fetchall()
 
 
-            return {'error':0, '_uname':x[0],  '_rname': x[1], '_bio' : x[2], '_pfp' : x[3], '_email' : x[4], '_follower': z, '_following': q, '_posts': y}
+            return {'error':0, '_uname':x[0],  '_rname': x[1], '_bio' : x[2], '_pfp' : x[3], '_email' : x[4], '_follower': z, '_following': q, '_postCount': p, '_posts': y}
         except mysql.connector.Error as e:
             return {'error':e.errno, 'msg':e.msg}
     
@@ -164,6 +168,10 @@ class dbase:
             """)
             q = (self.cursor.fetchone())[0]
             self.cursor.execute(f"""
+                SELECT count(*) FROM Posts WHERE _uid=(SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}");
+            """)
+            p = (self.cursor.fetchone())[0]
+            self.cursor.execute(f"""
                 select Posts.*, PostLikes._uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}") as liked, PostSaves._uid = (SELECT _id FROM UserAccounts WHERE _uname = "{data['_uname']}") as saved from Posts 
                 LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
                 LEFT JOIN PostSaves ON Posts._pid = PostSaves._pid
@@ -171,9 +179,7 @@ class dbase:
             """)
             y = self.cursor.fetchall()
 
-            print({'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q,'_posts': y,  '_doesFollow': ('Following' if r != None else 'Follow')})
-            
-            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_following': q,'_posts': y,  '_doesFollow': ('Following' if r != None else 'Follow')}
+            return {'error':0, '_rname': x[0], '_bio' : x[1], '_pfp' : x[2], '_uname': usr, '_follower': z, '_postCount':p, '_following': q, '_posts': y,  '_doesFollow': ('Following' if r != None else 'Follow')}
         except mysql.connector.Error as e:
             print(e)
             return {'error':e.errno, 'msg':e.msg}
