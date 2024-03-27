@@ -271,7 +271,7 @@ class dbase:
         except mysql.connector.Error as er:
             pass
 
-    def SavePost(self, data):
+    def CreatePost(self, data):
         try:
             self.cursor.execute(f"""
                 INSERT INTO Posts(_uid, _img, _text, _private) VALUE ({data['_id']}, "{data['_img']}", "{data['_text']}", {data['_postType']});
@@ -346,4 +346,19 @@ class dbase:
                 """)
                 self.connection.commit()
                 return {'error': 0}
+            return {'error': er.errno, 'msg': er.msg}
+
+    def GetSaved(self, data):
+        try:
+            self.cursor.execute(f"""
+            	SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp, PostLikes._uid = {data['_id']} from Posts
+            		INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+            		INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+            		LEFT JOIN PostLikes ON PostLikes._pid = Posts._pid
+            		LEFT JOIN PostSaves ON PostSaves._pid = Posts._pid
+            			WHERE PostSaves._uid = {data['_id']};
+            """)
+
+            return {'error': 0, '_data': self.cursor.fetchall()}
+        except mysql.connector.Error as er:
             return {'error': er.errno, 'msg': er.msg}

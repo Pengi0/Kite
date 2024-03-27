@@ -9,6 +9,7 @@ import Error404 from "./pages/Error404";
 import Home from "./pages/private/Home";
 import Profile from "./pages/private/Profile";
 import User from "./pages/private/User";
+import Saved from "./pages/private/Saved";
 
 const userProp = {
   uid: 0,
@@ -42,6 +43,12 @@ function App() {
             path="/"
             element={
               <Home user={user} setUser={setUser} setLoggedIn={setLoggedIn} />
+            }
+          />
+          <Route
+            path="/saved"
+            element={
+              <Saved user={user} setUser={setUser} setLoggedIn={setLoggedIn} />
             }
           />
           <Route

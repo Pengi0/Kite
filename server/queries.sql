@@ -71,3 +71,11 @@ select Posts.*, PostLikes._uid = 3 as liked, PostSaves._uid = 3 as saved from Po
 LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
 LEFT JOIN PostSaves ON Posts._pid = PostSaves._pid
 WHERE Posts._uid = 3;
+SELECT count(*) FROM Posts WHERE _uid=3;
+
+SELECT Posts.*, UserAccounts._uname, UserProfiles._pfp, PostLikes._uid = 3 from Posts
+	INNER JOIN UserAccounts ON UserAccounts._id = Posts._uid
+	INNER JOIN UserProfiles ON UserProfiles._id = Posts._uid
+	LEFT JOIN PostLikes ON PostLikes._pid = Posts._pid
+	LEFT JOIN PostSaves ON PostSaves._pid = Posts._pid
+		WHERE PostSaves._uid = 3;

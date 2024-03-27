@@ -1,5 +1,5 @@
 import { Key, MouseEventHandler, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { send, toImg } from "../../lib/io";
 import CreatePost from "./CreatePost";
 
@@ -164,6 +164,7 @@ function NotificationMenu(props: { enabled: boolean; user: any }) {
   );
 }
 function MoreMenu(props: moreMenuProps) {
+  const navigate = useNavigate();
   return (
     <div
       className={
@@ -180,6 +181,13 @@ function MoreMenu(props: moreMenuProps) {
             pass: "",
           });
           props.setLoggedIn(false);
+        }}
+      />
+      <SidebarPlate
+        icon="Bookmark"
+        name="Saved"
+        action={() => {
+          navigate("/saved");
         }}
       />
     </div>
@@ -220,7 +228,6 @@ export default function Sidebar(props: sidebarProps) {
           name="Search"
           action={() => setSearchEnabled(!searchEnabled)}
         />
-        <SidebarPlate icon="Explore" name="Explore" action={undefined} />
         <SidebarPlate
           icon="add_box"
           name="Create"

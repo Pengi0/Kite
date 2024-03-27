@@ -63,7 +63,7 @@ def handleRequest():
     elif data['type'] == 'get-notifications':
         x = dbase.GetNotifications(data)
     elif data['type'] == 'create-post':
-        x = dbase.SavePost(data)
+        x = dbase.CreatePost(data)
     elif data['type'] == 'delete-post':
         x = dbase.DeletePost(data)
     elif data['type'] == 'get-home-post':
@@ -74,6 +74,8 @@ def handleRequest():
         x = dbase.SavePost(data)
     elif data['type'] == 'get-like-and-save':
         x = dbase.GetLikeAndSave(data)
+    elif data['type'] == 'get-saved':
+        x = dbase.GetSaved(data)
     elif data['type'] == 'post-img':
         loc = save_img(data['base64'])
         x = {'error':0, 'loc': loc}

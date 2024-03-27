@@ -9,7 +9,6 @@ interface props {
   };
 }
 export default function CreatePost(props: props) {
-  const [type, setType] = useState(0);
   const [postType, setPostType] = useState(1);
   const [src, setSrc] = useState("");
 
@@ -107,50 +106,27 @@ export default function CreatePost(props: props) {
           maxLength={255}
           className="relative translate-x-1/2 mt-5 p-3 w-1/2 h-40 text-xl resize-none rounded-xl bg-white hover:cursor-text hover:border-blue-500 border border-gray-500"
         />
-        <div className="mx-auto w-64 flex mt-10 mb-10 rounded-full bg-gray-200 border-gray-400 border">
+
+        <div className="mx-auto w-64 flex mt-10 mb-20 rounded-full bg-gray-200 border-gray-400 border">
           <div
-            onClick={() => setType(0)}
+            onClick={() => setPostType(0)}
             className="w-32 px-9 py-3 text-2xl rounded-full hover:cursor-pointer"
           >
-            Story
+            Public
           </div>
           <div
-            onClick={() => setType(1)}
+            onClick={() => setPostType(1)}
             className="w-32 px-10 py-3 text-2xl rounded-full hover:cursor-pointer"
           >
-            Post
+            Private
           </div>
           <div
             className={
               "w-32 px-16 bg-opacity-10 bg-black relative rounded-full transition-all " +
-              (type ? "-translate-x-32" : "-translate-x-64")
+              (postType ? "-translate-x-32" : "-translate-x-64")
             }
           ></div>
         </div>
-        {type ? (
-          <div className="mx-auto w-64 flex mt-10 mb-20 rounded-full bg-gray-200 border-gray-400 border">
-            <div
-              onClick={() => setPostType(0)}
-              className="w-32 px-9 py-3 text-2xl rounded-full hover:cursor-pointer"
-            >
-              Public
-            </div>
-            <div
-              onClick={() => setPostType(1)}
-              className="w-32 px-10 py-3 text-2xl rounded-full hover:cursor-pointer"
-            >
-              Private
-            </div>
-            <div
-              className={
-                "w-32 px-16 bg-opacity-10 bg-black relative rounded-full transition-all " +
-                (postType ? "-translate-x-32" : "-translate-x-64")
-              }
-            ></div>
-          </div>
-        ) : (
-          ""
-        )}
         <br />
         <button
           onClick={submit}

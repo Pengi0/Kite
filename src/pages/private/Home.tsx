@@ -164,12 +164,7 @@ export default function Home(props: homeProps) {
       />
       <div className="ml-80">
         <div className="mx-auto flex w-[56rem] m-2 px-2 rounded-xl bg-gray-400">
-          <div className="w-[10.5rem] h-[5.5rem] my-3 mx-1 rounded-2xl bg-gradient-to-tr from-teal-500 to-green-300">
-            <img
-              src={toImg("def/pfp")}
-              className="w-40 h-20 m-1 rounded-xl object-cover"
-            />
-          </div>
+          <div className="w-[10.5rem] h-[5.5rem] my-3 mx-1 rounded-2xl bg-gradient-to-tr from-teal-500 to-green-300"></div>
         </div>
         <div className="mx-auto w-min mt-14">
           {data.map((el: any, index: number, arr: never[]) => {
