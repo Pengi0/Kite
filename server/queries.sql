@@ -61,11 +61,11 @@ SELECT x.*, PostLikes._uid = 3 as liked, PostSaves._uid = 3 as saved FROM (SELEC
 	ORDER BY RAND()
 	LIMIT 0,10;
     
-CREATE TABLE PostLikes(_uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _pid INT, FOREIGN KEY(_pid) REFERENCES Posts(_pid), UNIQUE(_uid, _pid) );
+CREATE TABLE PostLikes(_uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id) ON DELETE CASCADE, _pid INT, FOREIGN KEY(_pid) REFERENCES Posts(_pid) ON DELETE CASCADE, UNIQUE(_uid, _pid) );
 DROP TABLE PostLikes;
 SELECT * FROM PostLikes;
-CREATE TABLE PostSaves(_uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id), _pid INT, FOREIGN KEY(_pid) REFERENCES Posts(_pid), UNIQUE(_uid, _pid) );
-DROP TABLE PostLikes;
+CREATE TABLE PostSaves(_uid INT, FOREIGN KEY(_uid) REFERENCES UserAccounts(_id) ON DELETE CASCADE, _pid INT, FOREIGN KEY(_pid) REFERENCES Posts(_pid) ON DELETE CASCADE, UNIQUE(_uid, _pid) );
+DROP TABLE PostSaves;
 
 select Posts.*, PostLikes._uid = 3 as liked, PostSaves._uid = 3 as saved from Posts 
 LEFT JOIN PostLikes ON Posts._pid = PostLikes._pid
